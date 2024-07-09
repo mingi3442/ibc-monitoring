@@ -4,7 +4,7 @@ go 1.21.5
 
 require (
 	github.com/cosmos/cosmos-sdk v0.50.7
-	github.com/mingi3442/logger v0.0.0-20240707152955-748d7f1036fa
+	github.com/mingi3442/logger v0.0.0-20240709173239-7d793050b3b8
 	google.golang.org/grpc v1.65.0
 )
 

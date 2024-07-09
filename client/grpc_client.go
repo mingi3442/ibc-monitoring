@@ -5,7 +5,7 @@ import (
 
   "github.com/cosmos/cosmos-sdk/codec"
   grpctypes "github.com/cosmos/cosmos-sdk/types/grpc"
-  slashingTypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+  slashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
   "github.com/mingi3442/logger"
   "google.golang.org/grpc"
   "google.golang.org/grpc/credentials/insecure"

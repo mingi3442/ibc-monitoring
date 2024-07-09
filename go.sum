@@ -468,8 +468,8 @@ github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D
 github.com/mattn/go-runewidth v0.0.2/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
-github.com/mingi3442/logger v0.0.0-20240707152955-748d7f1036fa h1:IruDAOudPwifTBogaTE9c7OiVU8WFWYcU1iYTTdkezs=
-github.com/mingi3442/logger v0.0.0-20240707152955-748d7f1036fa/go.mod h1:PzFJNB4Y9wwg7b3l/X/pk8lZfRWEUKxrikiSCitYLk0=
+github.com/mingi3442/logger v0.0.0-20240709173239-7d793050b3b8 h1:2jSZOjWpSiuAtoTxrRVXMbHPLviWzVnkq1lDw8s7Jxs=
+github.com/mingi3442/logger v0.0.0-20240709173239-7d793050b3b8/go.mod h1:PzFJNB4Y9wwg7b3l/X/pk8lZfRWEUKxrikiSCitYLk0=
 github.com/minio/highwayhash v1.0.2 h1:Aak5U0nElisjDCfPSG79Tgzkn2gl66NxOMspRrKnA/g=
 github.com/minio/highwayhash v1.0.2/go.mod h1:BQskDq+xkJ12lmlUUi7U0M5Swg3EWR+dLTk+kldvVxY=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
