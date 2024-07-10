@@ -1,10 +1,10 @@
-package client
+package grpc
 
 import (
   "context"
 
   "github.com/cosmos/cosmos-sdk/codec"
-  grpctypes "github.com/cosmos/cosmos-sdk/types/grpc"
+  grpcTypes "github.com/cosmos/cosmos-sdk/types/grpc"
   slashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
   "github.com/mingi3442/logger"
   "google.golang.org/grpc"
@@ -15,6 +15,7 @@ import (
 type GrpcClient struct {
   Conn        *grpc.ClientConn
   networkName string
+  url         string
 }
 
 func Connect(url, networkName string) (*GrpcClient, error) {
@@ -28,25 +29,30 @@ func Connect(url, networkName string) (*GrpcClient, error) {
   return &GrpcClient{
     Conn:        conn,
     networkName: networkName,
+    url:         url,
   }, nil
 
 }
 
-func (c GrpcClient) DisConnect() {
-  logger.Info("Disconnected from cosmos-grpc")
-  c.Conn.Close()
+func (gc GrpcClient) DisConnect() error {
+  if gc.Conn != nil {
+    logger.Info("Disconnected from cosmos-grpc for network %s", gc.networkName)
+    gc.Conn.Close()
+  }
+  logger.Error("Failed to disconnect from cosmos-grpc for network %s", gc.networkName)
+  return nil
 }
 
-func (c GrpcClient) GetLatestBlock() string {
+func (gc GrpcClient) GetLatestBlock() string {
   var header metadata.MD
-  client := slashingTypes.NewQueryClient(c.Conn)
+  client := slashingTypes.NewQueryClient(gc.Conn)
   _, err := client.Params(context.Background(), &slashingTypes.QueryParamsRequest{}, grpc.Header(&header))
   if err != nil {
     logger.Fatal("Error: %v\n", err)
   }
 
-  blockHeight := header.Get(grpctypes.GRPCBlockHeightHeader)[0]
+  blockHeight := header.Get(grpcTypes.GRPCBlockHeightHeader)[0]
 
-  logger.Notice("[%s] Block Height: %s", c.networkName, blockHeight)
+  logger.Notice("[%s] Block Height: %s", gc.networkName, blockHeight)
   return blockHeight
 }
