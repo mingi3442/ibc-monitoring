@@ -1,0 +1,7 @@
+{
+  "network": "cosmos",
+  "action": [
+    "/ibc.core.client.v1.MsgUpdateClient",
+    "/ibc.core.channel.v1.MsgAcknowledgement"
+  ]
+}

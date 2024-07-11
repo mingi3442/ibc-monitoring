@@ -1,0 +1,6 @@
+{
+  "network": "cosmos",
+  "action": [
+    "/ibc.applications.transfer.v1.MsgTransfer"
+  ]
+}

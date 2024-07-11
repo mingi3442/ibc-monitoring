@@ -5,6 +5,7 @@ go 1.21.5
 require (
 	github.com/cometbft/cometbft v0.38.9
 	github.com/cosmos/cosmos-sdk v0.50.7
+	github.com/cosmos/gogoproto v1.4.12
 	github.com/mingi3442/logger v0.0.0-20240709173239-7d793050b3b8
 	google.golang.org/grpc v1.65.0
 )
@@ -41,7 +42,6 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gogogateway v1.2.0 // indirect
-	github.com/cosmos/gogoproto v1.4.12 // indirect
 	github.com/cosmos/iavl v1.1.2 // indirect
 	github.com/cosmos/ics23/go v0.10.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.13.3 // indirect
