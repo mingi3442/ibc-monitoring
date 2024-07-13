@@ -3,13 +3,12 @@ package grpc
 import (
   "context"
 
+  cmtService "github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
   "github.com/cosmos/cosmos-sdk/codec"
-  grpcTypes "github.com/cosmos/cosmos-sdk/types/grpc"
-  slashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
+
   "github.com/mingi3442/logger"
   "google.golang.org/grpc"
   "google.golang.org/grpc/credentials/insecure"
-  "google.golang.org/grpc/metadata"
 )
 
 type GrpcClient struct {
@@ -19,7 +18,6 @@ type GrpcClient struct {
 }
 
 func Connect(url, networkName string) (*GrpcClient, error) {
-  // conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()),)
   conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultCallOptions(grpc.ForceCodec(codec.NewProtoCodec(nil).GRPCCodec())))
   if err != nil {
     logger.Error("did not connect: %v", err)
@@ -43,16 +41,17 @@ func (gc GrpcClient) DisConnect() error {
   return nil
 }
 
-func (gc GrpcClient) GetLatestBlock() string {
-  var header metadata.MD
-  client := slashingTypes.NewQueryClient(gc.Conn)
-  _, err := client.Params(context.Background(), &slashingTypes.QueryParamsRequest{}, grpc.Header(&header))
+func (gc GrpcClient) GetLatestBlock() int64 {
+
+  client := cmtService.NewServiceClient(gc.Conn)
+
+  req := &cmtService.GetLatestBlockRequest{}
+
+  res, err := client.GetLatestBlock(context.Background(), req)
   if err != nil {
-    logger.Fatal("Error: %v\n", err)
+    logger.Fatal("could not get latest block: %v", err)
   }
 
-  blockHeight := header.Get(grpcTypes.GRPCBlockHeightHeader)[0]
-
-  logger.Notice("[%s] Block Height: %s", gc.networkName, blockHeight)
-  return blockHeight
+  logger.Notice("[%s] Latest Block Height: %d", gc.networkName, res.SdkBlock.Header.Height)
+  return res.SdkBlock.Header.Height
 }
