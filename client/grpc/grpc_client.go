@@ -12,9 +12,8 @@ import (
 )
 
 type GrpcClient struct {
-  Conn        *grpc.ClientConn
-  networkName string
-  url         string
+  Conn *grpc.ClientConn
+  url  string
 }
 
 func Connect(url, networkName string) (*GrpcClient, error) {
@@ -25,23 +24,22 @@ func Connect(url, networkName string) (*GrpcClient, error) {
   }
   logger.Info("Connected to cosmos-grpc")
   return &GrpcClient{
-    Conn:        conn,
-    networkName: networkName,
-    url:         url,
+    Conn: conn,
+    url:  url,
   }, nil
 
 }
 
-func (gc GrpcClient) DisConnect() error {
+func (gc GrpcClient) DisConnect(networkName string) error {
   if gc.Conn != nil {
-    logger.Info("Disconnected from cosmos-grpc for network %s", gc.networkName)
+    logger.Info("Disconnected from cosmos-grpc for network %s", networkName)
     gc.Conn.Close()
   }
-  logger.Error("Failed to disconnect from cosmos-grpc for network %s", gc.networkName)
+  logger.Error("Failed to disconnect from cosmos-grpc for network %s", networkName)
   return nil
 }
 
-func (gc GrpcClient) GetLatestBlock() int64 {
+func (gc GrpcClient) GetLatestBlock(networkName string) int64 {
 
   client := cmtService.NewServiceClient(gc.Conn)
 
@@ -52,6 +50,6 @@ func (gc GrpcClient) GetLatestBlock() int64 {
     logger.Fatal("could not get latest block: %v", err)
   }
 
-  logger.Notice("[%s] Latest Block Height: %d", gc.networkName, res.SdkBlock.Header.Height)
+  logger.Notice("[%s] Latest Block Height: %d", networkName, res.SdkBlock.Header.Height)
   return res.SdkBlock.Header.Height
 }

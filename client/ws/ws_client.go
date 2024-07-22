@@ -12,10 +12,9 @@ import (
 )
 
 type WsClient struct {
-  RpcClient   *rpcHttp.HTTP
-  networkName string
-  url         string
-  ctx         context.Context
+  RpcClient *rpcHttp.HTTP
+  url       string
+  ctx       context.Context
 }
 
 func Connect(url, networkName string) (*WsClient, error) {
@@ -31,54 +30,59 @@ func Connect(url, networkName string) (*WsClient, error) {
   logger.Info("RPC client started for network %s", networkName)
 
   client := &WsClient{
-    RpcClient:   rpcWsClient,
-    url:         url,
-    networkName: networkName,
-    ctx:         context.Background(),
+    RpcClient: rpcWsClient,
+    url:       url,
+    ctx:       context.Background(),
   }
 
   return client, nil
 }
 
-func (wc *WsClient) DisConnect() error {
+func (wc *WsClient) DisConnect(networkName string) error {
   if wc.RpcClient != nil {
-    logger.Info("RPC client stopped for network %s", wc.networkName)
+    logger.Info("RPC client stopped for network %s", networkName)
     return wc.RpcClient.Stop()
   }
-  logger.Error("Fail to RPC client stopped for network %s", wc.networkName)
+  logger.Error("Fail to RPC client stopped for network %s", networkName)
   return nil
 }
 
-func (wc *WsClient) Subscribe(subscriber, query string) (<-chan coreTypes.ResultEvent, error) {
+func (wc *WsClient) Subscribe(subscriber, query, networkName string, recentState int64) (<-chan coreTypes.ResultEvent, error) {
 
   events, err := wc.RpcClient.Subscribe(wc.ctx, subscriber, query)
   if err != nil {
+    logger.Error("Failed to subscribe to events: %v", err)
     return nil, err
   }
 
   logger.Info("Subscribed to events with query: %s", query)
-  wc.wsEventHandler(events)
+  wc.wsEventHandler(events, networkName, recentState)
   return events, nil
 }
 
-func (wc *WsClient) wsEventHandler(txCh <-chan coreTypes.ResultEvent) {
+func (wc *WsClient) wsEventHandler(txCh <-chan coreTypes.ResultEvent, networkName string, recentState int64) {
+  logger.Debug("Starting event handler with recentState: %d", recentState)
   for {
     select {
     case event := <-txCh:
-      if eventTxData, ok := event.Data.(types.EventDataTx); ok {
+      // logger.Debug("Received event: %v", event)
+      if eventBlockData, ok := event.Data.(types.EventDataNewBlock); ok {
+        logger.Notice("[%s] New block created: %d", networkName, eventBlockData.Block.Height)
+      } else if eventTxData, ok := event.Data.(types.EventDataTx); ok {
         actions, found := event.Events["message.action"]
         if !found {
-          logger.Notice("[%s] No exist message.action in Transaction: %X, at Block: %+v", wc.networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
+          logger.Notice("[%s] No exist message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
           logger.Notice("--------------------------------------------------------------------------------")
         } else {
-          logger.Notice("[%s] message.action in Transaction: %X, at Block: %+v", wc.networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
-          utils.SaveActionData(actions, wc.networkName, "transaction_actions")
+          logger.Notice("[%s] message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
+          utils.SaveActionData(actions, networkName, "transaction_actions")
           for _, action := range actions {
             logger.Notice(" - %s", action)
           }
           logger.Notice("--------------------------------------------------------------------------------")
         }
-
+      } else {
+        logger.Warn("Unknown event data type: %T", event.Data)
       }
 
     case <-wc.ctx.Done():

@@ -35,10 +35,10 @@ func SaveActionData(actionData []string, networkName, dir string) error {
 
   data, err := json.MarshalIndent(formatData, "", "  ")
   if err != nil {
-    return fmt.Errorf("failed to marshal transaction: %w", err)
+    return fmt.Errorf("failed to marshal action: %w", err)
   }
 
-  filename := fmt.Sprintf("transaction_%s.json", time.Now().Format("2006-01-02T15-04-05"))
+  filename := fmt.Sprintf("%s_action_%s.json", networkName, time.Now().Format("2006-01-02T15-04-05"))
 
   filepath := filepath.Join(dir, filename)
 
