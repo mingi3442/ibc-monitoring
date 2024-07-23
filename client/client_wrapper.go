@@ -67,7 +67,8 @@ func (ibc *IBCClient) UpdateQuery(query string) {
 
 func (ibc *IBCClient) Subscribe() {
   func() {
-    go ibc.WsClient.Subscribe(ibc.Subscriber, ibc.Query, ibc.NetworkName, ibc.recentState)
+
+    go ibc.WsClient.Subscribe(ibc.Subscriber, ibc.Query, ibc.NetworkName, &ibc.recentState)
     // go func() {
     //   ibc.GrpcClient.GetLatestBlock(ibc.NetworkName)
     // }()

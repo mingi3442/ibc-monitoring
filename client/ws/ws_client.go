@@ -47,7 +47,7 @@ func (wc *WsClient) DisConnect(networkName string) error {
   return nil
 }
 
-func (wc *WsClient) Subscribe(subscriber, query, networkName string, recentState int64) (<-chan coreTypes.ResultEvent, error) {
+func (wc *WsClient) Subscribe(subscriber, query, networkName string, recentState *int64) (<-chan coreTypes.ResultEvent, error) {
 
   events, err := wc.RpcClient.Subscribe(wc.ctx, subscriber, query)
   if err != nil {
@@ -60,13 +60,14 @@ func (wc *WsClient) Subscribe(subscriber, query, networkName string, recentState
   return events, nil
 }
 
-func (wc *WsClient) wsEventHandler(txCh <-chan coreTypes.ResultEvent, networkName string, recentState int64) {
-  logger.Debug("Starting event handler with recentState: %d", recentState)
+func (wc *WsClient) wsEventHandler(txCh <-chan coreTypes.ResultEvent, networkName string, recentState *int64) {
   for {
+    logger.Debug("event handler with recentState: %d in %s", *recentState, networkName)
     select {
     case event := <-txCh:
       // logger.Debug("Received event: %v", event)
       if eventBlockData, ok := event.Data.(types.EventDataNewBlock); ok {
+        *recentState = int64(eventBlockData.Block.Height)
         logger.Notice("[%s] New block created: %d", networkName, eventBlockData.Block.Height)
       } else if eventTxData, ok := event.Data.(types.EventDataTx); ok {
         actions, found := event.Events["message.action"]
