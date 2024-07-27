@@ -12,8 +12,8 @@ func main() {
   cosmosIBCClient, _ := ibc.Connect("http://localhost:11157", "http://localhost:11290", "cosmos")
   osmosisIBCClient, _ := ibc.Connect("http://localhost:11257", "http://localhost:11290", "osmosis")
 
-  cosmosIBCClient.UpdateQuery("tm.event='NewBlock'")
-  osmosisIBCClient.UpdateQuery("tm.event='NewBlock'")
+  cosmosIBCClient.UpdateQuery("tm.event='Tx'")
+  osmosisIBCClient.UpdateQuery("tm.event='Tx'")
   cosmosIBCClient.UpdateSubscriber("relayer")
   osmosisIBCClient.UpdateSubscriber("relayer")
   go cosmosIBCClient.Subscribe()

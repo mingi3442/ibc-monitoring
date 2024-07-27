@@ -28,19 +28,27 @@ func SaveActionData(actionData []string, networkName, dir string) error {
     Action:      actionData,
     NetworkName: networkName,
   }
+  return saveJsonFile(formatData, dir, "action_transaction")
+}
+
+func SaveTransactionData(transaction interface{}, dir string) error {
+  return saveJsonFile(transaction, dir, "basic_transaction")
+}
+
+func saveJsonFile(saveData interface{}, dir, filename string) error {
   err := ensureDir(dir)
   if err != nil {
     return err
   }
 
-  data, err := json.MarshalIndent(formatData, "", "  ")
+  data, err := json.MarshalIndent(saveData, "", "  ")
   if err != nil {
-    return fmt.Errorf("failed to marshal action: %w", err)
+    return fmt.Errorf("failed to marshal transaction: %w", err)
   }
 
-  filename := fmt.Sprintf("%s_action_%s.json", networkName, time.Now().Format("2006-01-02T15-04-05"))
+  jsonFileName := fmt.Sprintf("%s_transaction_%s.json", filename, time.Now().Format("2006-01-02T15-04-05"))
 
-  filepath := filepath.Join(dir, filename)
+  filepath := filepath.Join(dir, jsonFileName)
 
   file, err := os.Create(filepath)
   if err != nil {

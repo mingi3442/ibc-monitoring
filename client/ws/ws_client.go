@@ -65,23 +65,23 @@ func (wc *WsClient) wsEventHandler(txCh <-chan coreTypes.ResultEvent, networkNam
     logger.Debug("event handler with recentState: %d in %s", *recentState, networkName)
     select {
     case event := <-txCh:
-      // logger.Debug("Received event: %v", event)
       if eventBlockData, ok := event.Data.(types.EventDataNewBlock); ok {
         *recentState = int64(eventBlockData.Block.Height)
         logger.Notice("[%s] New block created: %d", networkName, eventBlockData.Block.Height)
       } else if eventTxData, ok := event.Data.(types.EventDataTx); ok {
-        actions, found := event.Events["message.action"]
-        if !found {
-          logger.Notice("[%s] No exist message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
-          logger.Notice("--------------------------------------------------------------------------------")
-        } else {
-          logger.Notice("[%s] message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
-          utils.SaveActionData(actions, networkName, "transaction_actions")
-          for _, action := range actions {
-            logger.Notice(" - %s", action)
-          }
-          logger.Notice("--------------------------------------------------------------------------------")
-        }
+        utils.SaveTransactionData(eventTxData, "transaction_actions")
+        // actions, found := event.Events["message.action"]
+        // if !found {
+        //   logger.Notice("[%s] No exist message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
+        //   logger.Notice("--------------------------------------------------------------------------------")
+        // } else {
+        //   logger.Notice("[%s] message.action in Transaction: %X, at Block: %+v", networkName, types.Tx(eventTxData.Tx).Hash(), eventTxData.TxResult.Height)
+        //   utils.SaveActionData(actions, "transaction_actions")
+        //   for _, action := range actions {
+        //     logger.Notice(" - %s", action)
+        //   }
+        //   logger.Notice("--------------------------------------------------------------------------------")
+        // }
       } else {
         logger.Warn("Unknown event data type: %T", event.Data)
       }
