@@ -11,11 +11,6 @@ import (
   "google.golang.org/grpc/credentials/insecure"
 )
 
-type GrpcClient struct {
-  Conn *grpc.ClientConn
-  url  string
-}
-
 func Connect(url, networkName string) (*GrpcClient, error) {
   conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultCallOptions(grpc.ForceCodec(codec.NewProtoCodec(nil).GRPCCodec())))
   if err != nil {
@@ -24,8 +19,10 @@ func Connect(url, networkName string) (*GrpcClient, error) {
   }
   logger.Info("Connected to cosmos-grpc")
   return &GrpcClient{
-    Conn: conn,
-    url:  url,
+    Conn:          conn,
+    url:           url,
+    networkName:   networkName,
+    serviceClient: cmtService.NewServiceClient(conn),
   }, nil
 
 }
@@ -41,11 +38,9 @@ func (gc GrpcClient) DisConnect(networkName string) error {
 
 func (gc GrpcClient) GetLatestBlock(networkName string) int64 {
 
-  client := cmtService.NewServiceClient(gc.Conn)
-
   req := &cmtService.GetLatestBlockRequest{}
 
-  res, err := client.GetLatestBlock(context.Background(), req)
+  res, err := gc.serviceClient.GetLatestBlock(context.Background(), req)
   if err != nil {
     logger.Fatal("could not get latest block: %v", err)
   }

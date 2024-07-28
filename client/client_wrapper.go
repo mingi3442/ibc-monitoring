@@ -11,10 +11,6 @@ type IBCClient struct {
   GrpcClient  *grpc.GrpcClient
   recentState int64
   NetworkName string
-  WsUrl       string
-  GrpcUrl     string
-  Subscriber  string
-  Query       string
 }
 
 func Connect(wsUrl, grpcUrl, networkName string) (*IBCClient, error) {
@@ -34,8 +30,6 @@ func Connect(wsUrl, grpcUrl, networkName string) (*IBCClient, error) {
     WsClient:    wsClient,
     GrpcClient:  grpcClient,
     NetworkName: networkName,
-    WsUrl:       wsUrl,
-    GrpcUrl:     grpcUrl,
   }
   logger.Info("Connected to %s", networkName)
   return client, nil
@@ -56,19 +50,16 @@ func (ibc *IBCClient) DisConnect() error {
 }
 
 func (ibc *IBCClient) UpdateSubscriber(subscriber string) {
-  ibc.Subscriber = subscriber
-  logger.Info("Subscriber updated to %s", subscriber)
+  ibc.WsClient.UpdateSubscriber(subscriber)
 }
 
 func (ibc *IBCClient) UpdateQuery(query string) {
-  ibc.Query = query
-  logger.Info("Query updated to %s", query)
+  ibc.WsClient.UpdateQuery(query)
 }
 
 func (ibc *IBCClient) Subscribe() {
   func() {
-
-    go ibc.WsClient.Subscribe(ibc.Subscriber, ibc.Query, ibc.NetworkName, &ibc.recentState)
+    go ibc.WsClient.Subscribe(&ibc.recentState)
     // go func() {
     //   ibc.GrpcClient.GetLatestBlock(ibc.NetworkName)
     // }()
