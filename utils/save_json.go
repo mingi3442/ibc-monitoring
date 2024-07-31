@@ -28,15 +28,15 @@ func SaveActionData(actionData []string, networkName, dir string) error {
     Action:      actionData,
     NetworkName: networkName,
   }
-  return saveJsonFile(formatData, dir, "action_transaction")
+  return saveJsonFile(formatData, dir, "/action_transaction")
 }
 
 func SaveTransactionData(transaction interface{}, dir string) error {
-  return saveJsonFile(transaction, dir, "basic_transaction")
+  return saveJsonFile(transaction, dir, "/basic_transaction")
 }
 
 func saveJsonFile(saveData interface{}, dir, filename string) error {
-  err := ensureDir(dir)
+  err := ensureDir(".data" + dir)
   if err != nil {
     return err
   }

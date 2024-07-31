@@ -1,6 +1,0 @@
-{
-  "network": "osmosis",
-  "action": [
-    "/ibc.core.client.v1.MsgUpdateClient"
-  ]
-}
