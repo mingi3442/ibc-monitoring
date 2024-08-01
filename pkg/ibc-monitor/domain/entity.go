@@ -1,26 +1,19 @@
-package client
+package domain
 
 import (
-  grpc "github.com/mingi3442/ibc-monitoring/client/grpc"
-  ws "github.com/mingi3442/ibc-monitoring/client/ws"
+  grpc "github.com/mingi3442/ibc-monitoring/infrastructure/grpc"
+  ws "github.com/mingi3442/ibc-monitoring/infrastructure/ws"
   "github.com/mingi3442/logger"
 )
 
-type IBCClient struct {
-  WsClient    *ws.WsClient
-  GrpcClient  *grpc.GrpcClient
-  recentState int64
-  NetworkName string
-}
-
-func Connect(wsUrl, grpcUrl, networkName string) (*IBCClient, error) {
-  wsClient, err := ws.Connect(wsUrl, networkName)
+func IBCClientBuild(config IBCClientConfig) (*IBCClient, error) {
+  wsClient, err := ws.Connect(config.WsUrl, config.NetworkName)
   if err != nil {
     logger.Error("Failed to connect to websocket client: %v", err)
     return nil, err
   }
 
-  grpcClient, err := grpc.Connect(grpcUrl, networkName)
+  grpcClient, err := grpc.Connect(config.GrpcUrl, config.NetworkName)
   if err != nil {
     logger.Error("Failed to connect to grpc client: %v", err)
     return nil, err
@@ -29,9 +22,13 @@ func Connect(wsUrl, grpcUrl, networkName string) (*IBCClient, error) {
   client := &IBCClient{
     WsClient:    wsClient,
     GrpcClient:  grpcClient,
-    NetworkName: networkName,
+    NetworkName: config.NetworkName,
   }
-  logger.Info("Connected to %s", networkName)
+
+  client.updateQuery(config.Query)
+  client.updateSubscriber(config.Subscriber)
+
+  logger.Info("Connected to %s", config.NetworkName)
   return client, nil
 
 }
@@ -49,19 +46,24 @@ func (ibc *IBCClient) DisConnect() error {
   return nil
 }
 
-func (ibc *IBCClient) UpdateSubscriber(subscriber string) {
+func (ibc *IBCClient) updateSubscriber(subscriber string) {
   ibc.WsClient.UpdateSubscriber(subscriber)
 }
 
-func (ibc *IBCClient) UpdateQuery(query string) {
+func (ibc *IBCClient) updateQuery(query string) {
   ibc.WsClient.UpdateQuery(query)
 }
 
-func (ibc *IBCClient) Subscribe() {
-  func() {
-    go ibc.WsClient.Subscribe(&ibc.recentState)
+func (ibc *IBCClient) Monitoring() {
+
+  go func() {
+
+    ibc.WsClient.Subscribe(&ibc.recentState)
     // go func() {
     //   ibc.GrpcClient.GetLatestBlock(ibc.NetworkName)
     // }()
   }()
+
+  select {}
+
 }

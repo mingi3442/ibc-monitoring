@@ -1,8 +1,6 @@
 package grpc
 
 import (
-  "context"
-
   cmtService "github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
   "github.com/cosmos/cosmos-sdk/codec"
 
@@ -17,7 +15,7 @@ func Connect(url, networkName string) (*GrpcClient, error) {
     logger.Error("did not connect: %v", err)
     return nil, err
   }
-  logger.Info("Connected to cosmos-grpc")
+  logger.Info("Connected to %s", networkName)
   return &GrpcClient{
     Conn:          conn,
     url:           url,
@@ -29,22 +27,9 @@ func Connect(url, networkName string) (*GrpcClient, error) {
 
 func (gc GrpcClient) DisConnect(networkName string) error {
   if gc.Conn != nil {
-    logger.Info("Disconnected from cosmos-grpc for network %s", networkName)
+    logger.Info("Disconnected for %s", networkName)
     gc.Conn.Close()
   }
-  logger.Error("Failed to disconnect from cosmos-grpc for network %s", networkName)
+  logger.Error("Failed to disconnect for %s", networkName)
   return nil
-}
-
-func (gc GrpcClient) GetLatestBlock(networkName string) int64 {
-
-  req := &cmtService.GetLatestBlockRequest{}
-
-  res, err := gc.serviceClient.GetLatestBlock(context.Background(), req)
-  if err != nil {
-    logger.Fatal("could not get latest block: %v", err)
-  }
-
-  logger.Notice("[%s] Latest Block Height: %d", networkName, res.SdkBlock.Header.Height)
-  return res.SdkBlock.Header.Height
 }
