@@ -3,7 +3,7 @@ package ws
 import (
   coreTypes "github.com/cometbft/cometbft/rpc/core/types"
   types "github.com/cometbft/cometbft/types"
-  "github.com/mingi3442/ibc-monitoring/utils"
+  "github.com/mingi3442/ibc-monitoring/internal/utils"
   "github.com/mingi3442/logger"
 )
 
