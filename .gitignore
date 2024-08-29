@@ -1,3 +1,5 @@
 
 # saved json data
-.data
+.data/*
+
+config.toml

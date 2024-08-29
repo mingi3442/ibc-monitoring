@@ -1,35 +1,39 @@
 package app
 
 import (
-  "sync"
+	"sync"
 
-  "github.com/mingi3442/ibc-monitoring/pkg/ibcmonitor"
+	"github.com/mingi3442/ibc-monitoring/internal/utils"
+	"github.com/mingi3442/ibc-monitoring/pkg/ibcmonitor"
+	"github.com/mingi3442/logger"
 )
 
 func Start() {
-  var wg sync.WaitGroup
+	var wg sync.WaitGroup
 
-  cosmosConfig := ibc_monitor.IBCClientConfigParamsBuild("http://localhost:11157", "http://localhost:11190", "cosmos", "tm.event='NewBlock' OR tm.event='Tx'", "relayer")
-  osmosisConfig := ibc_monitor.IBCClientConfigParamsBuild("http://localhost:11257", "http://localhost:11290", "osmosis", "tm.event='NewBlock'", "relayer")
+	config, err := utils.ReadConfig()
+	if err != nil {
+		logger.Fatal("Failed to read config file")
+	}
 
-  cosmosIBCClient, _ := ibc_monitor.IBCClientBuild(cosmosConfig)
-  osmosisIBCClient, _ := ibc_monitor.IBCClientBuild(osmosisConfig)
+	aChainIBCClient, _ := ibc_monitor.IBCClientBuild(config.ChainA)
+	bChainIBCClient, _ := ibc_monitor.IBCClientBuild(config.ChainB)
 
-  cosmosMonitorUseCase := ibc_monitor.NewMonitorUseCase(cosmosIBCClient)
-  osmosisMonitorUseCase := ibc_monitor.NewMonitorUseCase(osmosisIBCClient)
+	aChainMonitorUseCase := ibc_monitor.NewMonitorUseCase(aChainIBCClient)
+	bChainMonitorUseCase := ibc_monitor.NewMonitorUseCase(bChainIBCClient)
 
-  wg.Add(2)
-  go func() {
-    defer wg.Done()
-    cosmosMonitorUseCase.StartMonitoring()
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		aChainMonitorUseCase.StartMonitoring()
 
-  }()
+	}()
 
-  go func() {
-    defer wg.Done()
-    osmosisMonitorUseCase.StartMonitoring()
-  }()
+	go func() {
+		defer wg.Done()
+		bChainMonitorUseCase.StartMonitoring()
+	}()
 
-  wg.Wait()
+	wg.Wait()
 
 }

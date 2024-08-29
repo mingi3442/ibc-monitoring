@@ -1,0 +1,14 @@
+[ChainA]
+network_name = 
+grpc_url =  
+ws_url = 
+query = 
+subscriber = 
+
+
+[ChainB]
+network_name = 
+grpc_url =  
+ws_url = 
+query = 
+subscriber = 
